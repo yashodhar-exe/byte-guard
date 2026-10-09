@@ -1,0 +1,13 @@
+create index organization_members_user_organization_idx on public.organization_members (user_id, organization_id);
+create index organizations_created_by_idx on public.organizations (created_by);
+create index brand_assets_brand_organization_idx on public.brand_assets (brand_id, organization_id);
+create index scans_brand_organization_idx on public.scans (brand_id, organization_id);
+create index scans_requested_by_idx on public.scans (requested_by);
+create index scan_sources_scan_organization_idx on public.scan_sources (scan_id, organization_id);
+create index findings_brand_organization_idx on public.findings (brand_id, organization_id);
+create index findings_candidate_organization_idx on public.findings (candidate_id, organization_id);
+create index findings_scan_organization_idx on public.findings (scan_id, organization_id);
+create index finding_evidence_finding_organization_idx on public.finding_evidence (finding_id, organization_id);
+create index analyst_feedback_finding_organization_idx on public.analyst_feedback (finding_id, organization_id);
+create index analyst_feedback_user_idx on public.analyst_feedback (user_id);
+revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
