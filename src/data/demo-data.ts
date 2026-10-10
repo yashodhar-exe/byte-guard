@@ -6,7 +6,7 @@ export const demoWorkspace: WorkspaceData = {
   organization: { id: 'org-demo', name: 'Northstar Security Lab' },
   brands: [
     {
-      id: 'brand-acme', organization_id: 'org-demo', name: 'Acme Wallet', description: 'A fictional mobile wallet used only for the Byte Gaurd demo.', website: 'https://acmewallet.example', root_domains: ['acmewallet.example'], aliases: ['AcmePay', 'Acme Wallet'], product_names: ['Acme Wallet'], keywords: ['wallet', 'payments'], identifiers: ['ACME-001'], logo_path: null, region: 'United States', official_description: 'Acme Wallet is a fictional digital wallet for secure payments.', created_at: timestamp
+      id: 'brand-acme', organization_id: 'org-demo', name: 'Acme Wallet', description: 'A fictional mobile wallet used only for the Byte Guard demo.', website: 'https://acmewallet.example', root_domains: ['acmewallet.example'], aliases: ['AcmePay', 'Acme Wallet'], product_names: ['Acme Wallet'], keywords: ['wallet', 'payments'], identifiers: ['ACME-001'], logo_path: null, region: 'United States', official_description: 'Acme Wallet is a fictional digital wallet for secure payments.', created_at: timestamp
     }
   ],
   assets: [

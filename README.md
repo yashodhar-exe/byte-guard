@@ -1,6 +1,6 @@
-# Byte Gaurd
+# Byte Guard
 
-Byte Gaurd is a digital risk protection prototype for investigating potentially impersonating social profiles and app listings. It uses explainable, heuristic signals and explicit official-asset exclusions; it does not report, contact, block, or take down third-party accounts.
+Byte Guard is a digital risk protection prototype for investigating potentially impersonating social profiles and app listings. It uses explainable, heuristic signals and explicit official-asset exclusions; it does not report, contact, block, or take down third-party accounts.
 
 ## Local development
 

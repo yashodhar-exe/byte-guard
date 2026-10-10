@@ -43,7 +43,7 @@ export function AppShell({ children, onSignOut }: PropsWithChildren<{ onSignOut?
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950">
               <ShieldCheck size={18} />
             </span>
-            <span>Byte Gaurd</span>
+            <span>Byte Guard</span>
           </NavLink>
         )}
       </div>
@@ -109,7 +109,7 @@ export function AppShell({ children, onSignOut }: PropsWithChildren<{ onSignOut?
       </div>
     </aside>
     <header className={cn('sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur transition-[margin] duration-200 dark:border-slate-800 dark:bg-slate-950/90', collapsed ? 'md:ml-16' : 'md:ml-64', 'md:px-8')}>
-      <NavLink to="/" className="flex items-center gap-2 font-semibold md:hidden"><span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950"><ShieldCheck size={18} /></span>Byte Gaurd</NavLink>
+      <NavLink to="/" className="flex items-center gap-2 font-semibold md:hidden"><span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950"><ShieldCheck size={18} /></span>Byte Guard</NavLink>
       <div className="hidden flex-1 md:block" />
       <div className="flex items-center gap-1"><Button variant="ghost" className="h-9 min-h-9 w-9 px-0" aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}</Button><Button variant="ghost" className="h-9 min-h-9 w-9 px-0" aria-label="Notifications"><Bell size={17} /></Button>{onSignOut && <Button variant="secondary" className="ml-2 h-9 min-h-9" onClick={() => void onSignOut()}>Sign out</Button>}</div>
     </header>
