@@ -10,23 +10,23 @@ export function Button({ className, variant = 'primary', ...props }: ButtonHTMLA
     ghost: 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
     danger: 'bg-slate-950 text-white hover:bg-slate-800 border border-slate-800'
   }
-  return <button className={cn('inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-3.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-slate-950', styles[variant], className)} {...props} />
+  return <button className={cn('inline-flex min-h-10 items-center justify-center gap-2 rounded-sm px-3.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-slate-950', styles[variant], className)} {...props} />
 }
 
 export function Card({ className, children }: PropsWithChildren<{ className?: string }>) {
-  return <section className={cn('rounded-md border border-slate-300 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900', className)}>{children}</section>
+  return <section className={cn('rounded-sm border border-slate-300 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900', className)}>{children}</section>
 }
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cn('min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-950 focus:ring-1 focus:ring-slate-950 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props} />
+  return <input className={cn('min-h-10 w-full rounded-sm border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-950 focus:ring-1 focus:ring-slate-950 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props} />
 }
 
 export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className={cn('min-h-24 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-950 focus:ring-1 focus:ring-slate-950 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props} />
+  return <textarea className={cn('min-h-24 w-full rounded-sm border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-950 focus:ring-1 focus:ring-slate-950 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props} />
 }
 
 export function Select({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className={cn('min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none focus:border-slate-950 focus:ring-1 focus:ring-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props}>{children}</select>
+  return <select className={cn('min-h-10 w-full rounded-sm border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none focus:border-slate-950 focus:ring-1 focus:ring-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props}>{children}</select>
 }
 
 export function Field({ label, error, children }: PropsWithChildren<{ label: string; error?: string }>) {
@@ -41,23 +41,23 @@ const severityStyles: Record<Severity, string> = {
 }
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
-  return <span className={cn('inline-flex rounded-md border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider', severityStyles[severity])}>{titleCase(severity)}</span>
+  return <span className={cn('inline-flex rounded-sm border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider', severityStyles[severity])}>{titleCase(severity)}</span>
 }
 
 export function StatusBadge({ status }: { status: ReviewStatus | TrustStatus | ExclusionStatus | string }) {
-  return <span className={cn('inline-flex rounded-md border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300')}>{titleCase(status)}</span>
+  return <span className={cn('inline-flex rounded-sm border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300')}>{titleCase(status)}</span>
 }
 
 export function OriginBadge({ origin }: { origin: DataOrigin }) {
-  return <span className={cn('inline-flex rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest', origin === 'synthetic' ? 'border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-slate-950')}>{origin === 'synthetic' ? 'Demo' : 'Live'}</span>
+  return <span className={cn('inline-flex rounded-sm border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest', origin === 'synthetic' ? 'border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-slate-950')}>{origin === 'synthetic' ? 'Demo' : 'Live'}</span>
 }
 
 export function EmptyState({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
-  return <div className="grid min-h-64 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900/60"><div className="grid max-w-sm justify-items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"><Inbox size={20} /></span><div><h3 className="font-semibold text-slate-900 dark:text-white">{title}</h3><p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{description}</p></div>{action}</div></div>
+  return <div className="grid min-h-64 place-items-center rounded-sm border border-dashed border-slate-300 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900/60"><div className="grid max-w-sm justify-items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-sm bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"><Inbox size={20} /></span><div><h3 className="font-semibold text-slate-900 dark:text-white">{title}</h3><p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{description}</p></div>{action}</div></div>
 }
 
 export function ErrorState({ message, retry }: { message: string; retry?: () => void }) {
-  return <div className="flex items-start gap-3 rounded-md border border-slate-300 bg-slate-50 p-4 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"><AlertTriangle className="mt-0.5 shrink-0" size={18} /><div className="flex-1"><p className="font-semibold">Could not load this workspace</p><p className="mt-1">{message}</p></div>{retry && <Button variant="secondary" onClick={retry}>Retry</Button>}</div>
+  return <div className="flex items-start gap-3 rounded-sm border border-slate-300 bg-slate-50 p-4 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"><AlertTriangle className="mt-0.5 shrink-0" size={18} /><div className="flex-1"><p className="font-semibold">Could not load this workspace</p><p className="mt-1">{message}</p></div>{retry && <Button variant="secondary" onClick={retry}>Retry</Button>}</div>
 }
 
 export function LoadingState() {
