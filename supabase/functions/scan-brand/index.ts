@@ -255,55 +255,6 @@ async function searchUrlscan(terms: string[]): Promise<ProviderResult> {
   }
 }
 
-function unavailableSocialProviders() {
-  return [
-    unavailableProvider('Facebook Graph API', 'social', 'Facebook Page public-content access is not configured or approved for this project.', { search: 'not attempted', credentials: 'approved Page Public Content Access and documented scopes required', limitation: 'No unsupported public-page search is performed.' }),
-    unavailableProvider('TikTok API', 'social', 'TikTok approved product access is not configured for this project.', { search: 'not attempted', credentials: 'approved TikTok product access and required user or research authorization', limitation: 'No unrestricted profile search is performed.' })
-  ]
-}
-
-async function searchSerpstack(terms: string[]): Promise<ProviderResult> {
-  const apiKey = Deno.env.get('SERPSTACK_API_KEY')
-  if (!apiKey) return unavailableProvider('Serpstack Google Search API', 'web', 'SERPSTACK_API_KEY is not configured.', { search: 'Google organic search results', credentials: 'SERPSTACK_API_KEY required' })
-  const candidates: NormalizedCandidate[] = []
-  const seen = new Set<string>()
-  try {
-    for (const term of terms.slice(0, 5)) {
-      const url = new URL('http://api.serpstack.com/search')
-      url.searchParams.set('access_key', apiKey)
-      url.searchParams.set('query', term)
-      const payload = await fetchJson(url.toString())
-      if (payload.success === false || payload.error) {
-        const errObj = payload.error as Record<string, unknown> | undefined
-        throw new Error(`Serpstack API Error: ${errObj?.info || errObj?.type || 'Unknown error'}`)
-      }
-      const results = Array.isArray(payload.organic_results) ? payload.organic_results : []
-      for (const item of results) {
-        if (!item || typeof item !== 'object') continue
-        const record = item as Record<string, unknown>
-        const title = String(record.title ?? '')
-        const itemUrl = String(record.url ?? '')
-        const snippet = String(record.snippet ?? '')
-        const domain = String(record.domain ?? '')
-        if (!itemUrl || seen.has(itemUrl)) continue
-        seen.add(itemUrl)
-        candidates.push({
-          sourceType: 'web', platform: 'Google Search', externalId: itemUrl,
-          name: title || domain || 'Unknown page', username: null,
-          description: snippet.slice(0, 4000), sourceUrl: asHttpsUrl(itemUrl) ?? itemUrl,
-          imageUrl: null, publisher: domain, publisherWebsite: null,
-          rating: null, downloadEstimate: null,
-          rawMetadata: { domain, observedUrl: itemUrl, position: String(record.position ?? '') }
-        })
-      }
-    }
-    return { provider: 'Serpstack Google Search API', sourceType: 'web', status: 'completed', candidates, errorMessage: null, capability: { search: 'Google organic search results', credentials: 'SERPSTACK_API_KEY required', pages: 'bounded to five terms' } }
-  } catch (error) {
-    const detail = safeError(error)
-    return { provider: 'Serpstack Google Search API', sourceType: 'web', status: detail.status, candidates, errorMessage: error instanceof Error ? error.message : detail.message, capability: { search: 'Google organic search results', credentials: 'SERPSTACK_API_KEY required' } }
-  }
-}
-
 function isOfficial(candidate: NormalizedCandidate, assets: OfficialAsset[]) {
   const sourceUrl = candidate.sourceUrl?.toLocaleLowerCase() ?? ''
   const packageId = String(candidate.rawMetadata.bundleId ?? '')
@@ -339,8 +290,7 @@ Deno.serve(async (request) => {
   const results = await Promise.all([
     searchApple(searchTerms),
     searchBluesky(searchTerms),
-    searchUrlscan(searchTerms),
-    searchSerpstack(searchTerms)
+    searchUrlscan(searchTerms)
   ])
   const sourceRows = results.map((result) => ({ organization_id: brand.organization_id, scan_id: scan.id, provider: result.provider, source_type: result.sourceType, status: result.status, capability: result.capability, records_collected: result.candidates.length, last_successful_retrieval: result.status === 'completed' ? now : null, error_message: result.errorMessage, data_origin: 'live' }))
   await admin.from('scan_sources').upsert(sourceRows, { onConflict: 'scan_id,provider' })

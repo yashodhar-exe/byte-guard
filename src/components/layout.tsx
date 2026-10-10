@@ -1,5 +1,5 @@
 import { useEffect, useState, type PropsWithChildren } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { BarChart3, Bell, ChevronLeft, ChevronRight, ClipboardCheck, Globe2, LogOut, Moon, ScanSearch, Settings, ShieldCheck, Smartphone, Sun, Tags } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { useWorkspace } from '../data/workspace'
@@ -26,30 +26,38 @@ function useTheme() {
 
 export function AppShell({ children, onSignOut }: PropsWithChildren<{ onSignOut?: () => Promise<void> }>) {
   const [collapsed, setCollapsed] = useState(false)
-  const { pathname } = useLocation()
   const { isDemo, organization } = useWorkspace()
   const { theme, setTheme } = useTheme()
 
   return <div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50">
     <aside className={cn('fixed inset-y-0 left-0 z-30 hidden border-r border-slate-200 bg-white transition-[width] duration-200 dark:border-slate-800 dark:bg-slate-950 md:flex md:flex-col', collapsed ? 'w-16 p-2' : 'w-64 p-3')}>
-      <div className={cn('flex items-center', collapsed ? 'h-12 flex-col justify-center gap-1 px-0' : 'h-12 justify-between px-2')}>
-        <NavLink to="/" className="flex items-center gap-2 overflow-hidden font-semibold tracking-tight text-slate-950 dark:text-white">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950">
-            <ShieldCheck size={18} />
-          </span>
-          {!collapsed && <span>Byte Gaurd</span>}
-        </NavLink>
-        <button
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          onClick={() => setCollapsed((value) => !value)}
-          className={cn(
-            "grid h-7 w-7 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800",
-            collapsed && "mt-1"
-          )}
-        >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={16} />}
-        </button>
+      <div className={cn('flex items-center', collapsed ? 'h-12 justify-center px-0' : 'h-12 px-2')}>
+        {collapsed ? (
+          <button onClick={() => setCollapsed(false)} aria-label="Expand sidebar" className="flex items-center gap-2 overflow-hidden font-semibold tracking-tight text-slate-950 dark:text-white">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950">
+              <ShieldCheck size={18} />
+            </span>
+          </button>
+        ) : (
+          <NavLink to="/" className="flex items-center gap-2 overflow-hidden font-semibold tracking-tight text-slate-950 dark:text-white">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950">
+              <ShieldCheck size={18} />
+            </span>
+            <span>Byte Gaurd</span>
+          </NavLink>
+        )}
       </div>
+
+      <button
+        aria-label="Collapse sidebar"
+        onClick={() => setCollapsed(true)}
+        className={cn(
+          "absolute -right-3 top-5 z-40 h-6 w-6 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800",
+          collapsed ? "hidden" : "grid"
+        )}
+      >
+        <ChevronLeft size={14} />
+      </button>
 
       <nav className={cn('grid gap-1', collapsed ? 'mt-6' : 'mt-7')}>
         {navigation.map(({ to, label, icon: Icon, end }) => (
@@ -79,17 +87,17 @@ export function AppShell({ children, onSignOut }: PropsWithChildren<{ onSignOut?
           <>
             <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-200">{organization?.name ?? 'Workspace'}</p>
             <p className="mt-1 text-xs text-slate-500">Digital risk protection</p>
+            <div className="mt-3">
+              {isDemo ? <OriginBadge origin="synthetic" /> : <OriginBadge origin="live" />}
+            </div>
           </>
         )}
-        <div className={cn('mt-3', collapsed ? 'flex justify-center scale-90' : '')}>
-          {isDemo ? <OriginBadge origin="synthetic" /> : <OriginBadge origin="live" />}
-        </div>
         {onSignOut && (
           <button
             onClick={() => void onSignOut()}
             className={cn(
-              'mt-4 flex h-10 items-center rounded-lg text-sm font-medium transition',
-              collapsed ? 'w-10 justify-center px-0 mx-auto' : 'w-full gap-3 px-3',
+              'flex h-10 items-center rounded-lg text-sm font-medium transition',
+              collapsed ? 'w-10 justify-center px-0 mx-auto' : 'mt-4 w-full gap-3 px-3',
               'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white'
             )}
             title={collapsed ? 'Sign out' : undefined}

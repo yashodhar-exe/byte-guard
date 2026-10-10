@@ -1,6 +1,6 @@
 # Architecture
 
-Byte Gaurd keeps organization-scoped records in Supabase. The browser uses a publishable key and Row Level Security; provider credentials and scan orchestration live only in the authenticated Edge Function.
+ByteXL keeps organization-scoped records in Supabase. The browser uses a publishable key and Row Level Security; provider credentials and scan orchestration live only in the authenticated Edge Function.
 
 ```mermaid
 flowchart LR
@@ -11,7 +11,8 @@ flowchart LR
   Storage[Supabase Storage brand-logos]
   Scan[scan-brand Edge Function]
   Apple[Apple App Store Search API]
-  YouTube[YouTube Data API v3]
+  Bluesky[Bluesky public API]
+  Urlscan[urlscan.io Search API]
   Adapters[Provider adapter interface]
   Normalize[Candidate normalization and deduplication]
   Exclusion[Exact official-asset exclusion]
@@ -26,7 +27,8 @@ flowchart LR
   UI --> Scan
   Scan --> Adapters
   Apple --> Adapters
-  YouTube --> Adapters
+  Bluesky --> Adapters
+  Urlscan --> Adapters
   Adapters --> Normalize
   Normalize --> Exclusion
   Exclusion --> Detection
@@ -41,7 +43,7 @@ flowchart LR
 
 1. An authenticated analyst creates a protected brand and registers authoritative IDs, URLs, domains, publishers, and optional logo.
 2. A live scan invokes `scan-brand`. It verifies the caller belongs to the brand’s organization, blocks a concurrent scan, and starts provider adapters independently.
-3. Every provider attempt becomes a `scan_sources` record. A provider that lacks credentials is marked unavailable; it does not create fake candidates.
+3. Every provider attempt becomes a `scan_sources` record. Apple and Bluesky do not need keys; urlscan.io is marked unavailable when its Edge Function secret is absent. No fake candidates are created.
 4. Returned source fields are normalized and upserted using the organization, source type, platform, and provider external ID.
 5. A verified exact account ID, application identifier, listing ID, or URL excludes that candidate before the active threat queue.
 6. Non-excluded candidates receive individually recorded name, description, publisher, and domain signals. Logo similarity remains unavailable until a safe compatible server-side image adapter is configured.

@@ -19,7 +19,7 @@ interface WorkspaceContextValue extends WorkspaceData {
 }
 
 const emptyData: WorkspaceData = { organization: null, brands: [], assets: [], scans: [], scanSources: [], candidates: [], findings: [], evidence: [], feedback: [] }
-const demoStorageKey = 'bytegaurd-demo-workspace-v1'
+const demoStorageKey = 'bytegaurd-demo-workspace-v2'
 
 function readDemoData() {
   try {
