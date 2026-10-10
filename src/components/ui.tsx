@@ -5,28 +5,28 @@ import type { DataOrigin, ExclusionStatus, ReviewStatus, Severity, TrustStatus }
 
 export function Button({ className, variant = 'primary', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger' }) {
   const styles = {
-    primary: 'bg-slate-900 text-white hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white',
-    secondary: 'border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800',
+    primary: 'bg-slate-950 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200',
+    secondary: 'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800',
     ghost: 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-    danger: 'bg-rose-600 text-white hover:bg-rose-700'
+    danger: 'bg-slate-950 text-white hover:bg-slate-800 border border-slate-800'
   }
-  return <button className={cn('inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-3.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-slate-950', styles[variant], className)} {...props} />
+  return <button className={cn('inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-3.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-slate-950', styles[variant], className)} {...props} />
 }
 
 export function Card({ className, children }: PropsWithChildren<{ className?: string }>) {
-  return <section className={cn('rounded-xl border border-slate-200 bg-white p-5 shadow-panel dark:border-slate-800 dark:bg-slate-900', className)}>{children}</section>
+  return <section className={cn('rounded-md border border-slate-300 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900', className)}>{children}</section>
 }
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cn('min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-800', className)} {...props} />
+  return <input className={cn('min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-950 focus:ring-1 focus:ring-slate-950 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props} />
 }
 
 export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className={cn('min-h-24 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-800', className)} {...props} />
+  return <textarea className={cn('min-h-24 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-950 focus:ring-1 focus:ring-slate-950 disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props} />
 }
 
 export function Select({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className={cn('min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-800', className)} {...props}>{children}</select>
+  return <select className={cn('min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none focus:border-slate-950 focus:ring-1 focus:ring-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400', className)} {...props}>{children}</select>
 }
 
 export function Field({ label, error, children }: PropsWithChildren<{ label: string; error?: string }>) {
@@ -34,35 +34,22 @@ export function Field({ label, error, children }: PropsWithChildren<{ label: str
 }
 
 const severityStyles: Record<Severity, string> = {
-  low: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-  medium: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-  high: 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300',
-  critical: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+  low: 'border-slate-300 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300',
+  medium: 'border-slate-500 bg-slate-100 text-slate-800 dark:border-slate-500 dark:bg-slate-800 dark:text-slate-200',
+  high: 'border-slate-700 bg-slate-200 text-slate-900 dark:border-slate-300 dark:bg-slate-700 dark:text-slate-100',
+  critical: 'border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-slate-950'
 }
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
-  return <span className={cn('inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', severityStyles[severity])}>{titleCase(severity)}</span>
+  return <span className={cn('inline-flex rounded-md border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider', severityStyles[severity])}>{titleCase(severity)}</span>
 }
 
 export function StatusBadge({ status }: { status: ReviewStatus | TrustStatus | ExclusionStatus | string }) {
-  const styles: Record<string, string> = {
-    verified: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-    pending: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-    inactive: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-    open: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
-    under_review: 'bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300',
-    confirmed_threat: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
-    false_positive: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-    resolved: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-    none: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-    official_asset: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-    trusted_relationship: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-  }
-  return <span className={cn('inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', styles[status] ?? 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300')}>{titleCase(status)}</span>
+  return <span className={cn('inline-flex rounded-md border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300')}>{titleCase(status)}</span>
 }
 
 export function OriginBadge({ origin }: { origin: DataOrigin }) {
-  return <span className={cn('inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide', origin === 'synthetic' ? 'bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300' : 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300')}>{origin === 'synthetic' ? 'Demo' : 'Live'}</span>
+  return <span className={cn('inline-flex rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest', origin === 'synthetic' ? 'border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-slate-950')}>{origin === 'synthetic' ? 'Demo' : 'Live'}</span>
 }
 
 export function EmptyState({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
@@ -70,7 +57,7 @@ export function EmptyState({ title, description, action }: { title: string; desc
 }
 
 export function ErrorState({ message, retry }: { message: string; retry?: () => void }) {
-  return <div className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200"><AlertTriangle className="mt-0.5 shrink-0" size={18} /><div className="flex-1"><p className="font-semibold">Could not load this workspace</p><p className="mt-1">{message}</p></div>{retry && <Button variant="secondary" onClick={retry}>Retry</Button>}</div>
+  return <div className="flex items-start gap-3 rounded-md border border-slate-300 bg-slate-50 p-4 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"><AlertTriangle className="mt-0.5 shrink-0" size={18} /><div className="flex-1"><p className="font-semibold">Could not load this workspace</p><p className="mt-1">{message}</p></div>{retry && <Button variant="secondary" onClick={retry}>Retry</Button>}</div>
 }
 
 export function LoadingState() {
