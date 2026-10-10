@@ -1,6 +1,6 @@
-# ByteXL
+# Byte Gaurd
 
-ByteXL is a digital risk protection prototype for investigating potentially impersonating social profiles and app listings. It uses explainable, heuristic signals and explicit official-asset exclusions; it does not report, contact, block, or take down third-party accounts.
+Byte Gaurd is a digital risk protection prototype for investigating potentially impersonating social profiles and app listings. It uses explainable, heuristic signals and explicit official-asset exclusions; it does not report, contact, block, or take down third-party accounts.
 
 ## Local development
 
@@ -11,6 +11,8 @@ npm run dev
 ```
 
 Without a configured publishable key, the app opens its clearly labelled synthetic demo workspace. To use the connected Supabase project, set a real `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env`, deploy the migration and Edge Function, then create an account from the sign-up screen.
+
+Set `URLSCAN_API_KEY` only in Supabase Edge Function secrets. Apple App Store and Bluesky use documented public endpoints without a key. The application does not use reverse-engineered endpoints or scrape around platform controls.
 
 ## Commands
 

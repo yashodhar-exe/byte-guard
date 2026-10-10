@@ -16,7 +16,7 @@ function WorkspaceRoutes({ onSignOut }: { onSignOut?: () => Promise<void> }) {
   const { loading, error, refresh } = useWorkspace()
   if (loading) return <AppShell onSignOut={onSignOut}><LoadingState /></AppShell>
   if (error) return <AppShell onSignOut={onSignOut}><ErrorState message={error} retry={() => void refresh()} /></AppShell>
-  return <AppShell onSignOut={onSignOut}><Routes><Route path="/" element={<DashboardPage />} /><Route path="/brands" element={<BrandsPage />} /><Route path="/brands/:brandId" element={<BrandDetailPage />} /><Route path="/social" element={<MonitorPage sourceType="social" />} /><Route path="/apps" element={<MonitorPage sourceType="app" />} /><Route path="/findings" element={<FindingsPage />} /><Route path="/findings/:findingId" element={<FindingDetailPage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></AppShell>
+  return <AppShell onSignOut={onSignOut}><Routes><Route path="/" element={<DashboardPage />} /><Route path="/brands" element={<BrandsPage />} /><Route path="/brands/:brandId" element={<BrandDetailPage />} /><Route path="/social" element={<MonitorPage sourceType="social" />} /><Route path="/apps" element={<MonitorPage sourceType="app" />} /><Route path="/web" element={<MonitorPage sourceType="web" />} /><Route path="/findings" element={<FindingsPage />} /><Route path="/findings/:findingId" element={<FindingDetailPage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></AppShell>
 }
 
 function AuthenticatedApp() {

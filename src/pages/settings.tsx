@@ -5,12 +5,9 @@ import { Card, OriginBadge, PageHeading, StatusBadge } from '../components/ui'
 
 const providers = [
   { name: 'Apple App Store Search API', kind: 'App discovery', credential: 'No key required', limitation: 'Search is bounded and rate-limited. Results are catalog metadata, not a malware verdict.' },
-  { name: 'YouTube Data API v3', kind: 'Social discovery', credential: 'YOUTUBE_API_KEY', limitation: 'Search only uses documented channel search capabilities and the configured API quota.' },
-  { name: 'Google Play catalog provider', kind: 'App discovery', credential: 'Provider-specific server secret', limitation: 'Requires an explicitly configured third-party catalog provider.' },
-  { name: 'Meta Graph API', kind: 'Social discovery', credential: 'META_APP_ID and META_APP_SECRET', limitation: 'Limited to approved scopes, supported account types, and documented endpoints.' },
-  { name: 'X API', kind: 'Social discovery', credential: 'X_API_KEY and X_API_SECRET', limitation: 'Requires a valid access tier and documented search access.' },
-  { name: 'TikTok API', kind: 'Social discovery', credential: 'TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET', limitation: 'Only approved documented use cases are supported.' },
-  { name: 'Reddit API', kind: 'Social discovery', credential: 'REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET', limitation: 'Requires registered application access and terms-compliant usage.' }
+  { name: 'Bluesky public API', kind: 'Social discovery', credential: 'No key required', limitation: 'Searches public Bluesky profiles and authors returned by public post search; it does not access private content.' },
+  { name: 'urlscan.io Search API', kind: 'Web discovery', credential: 'URLSCAN_API_KEY', limitation: 'Searches historical public urlscan observations for brand-like domains; it does not crawl or visit candidate websites.' },
+  { name: 'Serpstack Google Search API', kind: 'Web discovery', credential: 'SERPSTACK_API_KEY', limitation: 'Searches Google organic search results; it does not crawl or visit candidate websites.' }
 ]
 
 export function SettingsPage() {

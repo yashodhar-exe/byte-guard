@@ -5,20 +5,12 @@
 | Provider | Capability | Server configuration | Status when missing | Limits and handling |
 | --- | --- | --- | --- | --- |
 | Apple App Store Search API | Searches the software catalog and normalizes app name, store ID, seller, listing URL, icon URL, rating, and bundle ID when returned. | None | Live attempt | Five terms and 25 results per term. Requests time out after eight seconds. Provider failures are recorded independently. |
-| YouTube Data API v3 | Searches public channel resources using `search.list` with `part=snippet` and `type=channel`. | `YOUTUBE_API_KEY` as an Edge Function secret | Unavailable | Five terms and 25 results per term. The API key never reaches the browser. |
+| Bluesky public API | Searches public profiles and the authors of public matching posts. | None | Live attempt | Five terms and 25 profile/post results each. It only uses documented public endpoints and never accesses private content. |
+| urlscan.io Search API | Searches historical public urlscan observations for brand-like domains and records the scan result, domain, title, and source URL. | `URLSCAN_API_KEY` as an Edge Function secret | Unavailable | Five terms and 20 observations each. This adapter never visits, crawls, or submits candidate websites. |
 
-Apple documents the search endpoint, `term`, country, `media=software`, result limit, and approximate request rate limit in its [iTunes Search API documentation](https://performance-partners.apple.com/search-api). YouTube documents `search.list`, `part=snippet`, resource type filtering, bounded pages, and quota behavior in its [Data API reference](https://developers.google.com/youtube/v3/docs/search/list).
+Apple documents the search endpoint, `term`, country, `media=software`, result limit, and approximate request rate limit in its [iTunes Search API documentation](https://performance-partners.apple.com/search-api).
 
-## Declared but intentionally unavailable adapters
-
-| Provider | Needed configuration | Documented limitation reflected in ByteXL |
-| --- | --- | --- |
-| Google Play catalog | A configured third-party provider such as 42matters and its server-side key | No unsupported scraping is performed. The adapter is unavailable until a licensed provider is configured. |
-| Instagram and Facebook | `META_APP_ID`, `META_APP_SECRET`, approved access, and required account/scopes | Only documented Graph API capabilities for approved use cases may be enabled. |
-| X | `X_API_KEY`, `X_API_SECRET`, and a suitable access tier | Search is enabled only when the selected tier documents it. |
-| TikTok | `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, approved product access | No private-content or anti-bot bypassing is attempted. |
-| Reddit | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET` | Must use registered-app access in accordance with API terms. |
-| URL reputation | A specific provider key such as `URLSCAN_API_KEY`, `GOOGLE_WEB_RISK_API_KEY`, or `VIRUSTOTAL_API_KEY` | Reputation is supplementary evidence only, never a standalone verdict. |
+Bluesky documents public, unauthenticated GET requests through its [AppView HTTP API](https://bsky.network/docs/category/http-reference/). urlscan.io documents its [keyed Search API](https://docs.urlscan.io/apis/urlscan-openapi/search) for historical scan records. The application does not reverse-engineer website internals, use undocumented endpoints, scrape authenticated content, or bypass provider controls.
 
 ## Adding a provider
 

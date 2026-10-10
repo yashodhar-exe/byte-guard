@@ -1,4 +1,4 @@
-export type SourceType = 'social' | 'app'
+export type SourceType = 'social' | 'app' | 'web'
 export type DataOrigin = 'live' | 'synthetic'
 export type Severity = 'low' | 'medium' | 'high' | 'critical'
 export type ReviewStatus = 'open' | 'under_review' | 'confirmed_threat' | 'false_positive' | 'resolved'

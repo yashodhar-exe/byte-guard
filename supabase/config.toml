@@ -1,4 +1,4 @@
-project_id = "ByteXL"
+project_id = "ByteGaurd"
 
 [api]
 schemas = ["public", "graphql_public"]

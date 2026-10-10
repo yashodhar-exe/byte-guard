@@ -14,7 +14,7 @@ const now = new Date().toISOString()
 const { data: brand, error: brandError } = await client.from('brands').upsert({
   organization_id: organizationId,
   name: 'Acme Wallet',
-  description: 'A fictional mobile wallet used only for the ByteXL demo.',
+  description: 'A fictional mobile wallet used only for the Byte Gaurd demo.',
   website: 'https://acmewallet.example',
   root_domains: ['acmewallet.example'],
   aliases: ['AcmePay', 'Acme Wallet'],

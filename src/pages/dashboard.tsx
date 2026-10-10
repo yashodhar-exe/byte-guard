@@ -14,7 +14,7 @@ export function DashboardPage() {
   const navigate = useNavigate()
   const { brands, candidates, findings, scans, scanSources, startScan, isDemo } = useWorkspace()
   const [scanError, setScanError] = useState<string | null>(null)
-  const activeFindings = findings.filter((finding) => finding.exclusion_status === 'none')
+  const activeFindings = findings.filter((finding) => finding.exclusion_status === 'none' && (finding.score >= 45 || finding.review_status === 'under_review' || finding.review_status === 'confirmed_threat'))
   const completed = scans.filter((scan) => scan.status === 'completed').length
   const partial = scans.filter((scan) => scan.status === 'partial').length
   const failed = scans.filter((scan) => scan.status === 'failed').length

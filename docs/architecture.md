@@ -1,6 +1,6 @@
 # Architecture
 
-ByteXL keeps organization-scoped records in Supabase. The browser uses a publishable key and Row Level Security; provider credentials and scan orchestration live only in the authenticated Edge Function.
+Byte Gaurd keeps organization-scoped records in Supabase. The browser uses a publishable key and Row Level Security; provider credentials and scan orchestration live only in the authenticated Edge Function.
 
 ```mermaid
 flowchart LR

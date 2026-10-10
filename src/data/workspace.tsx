@@ -19,7 +19,7 @@ interface WorkspaceContextValue extends WorkspaceData {
 }
 
 const emptyData: WorkspaceData = { organization: null, brands: [], assets: [], scans: [], scanSources: [], candidates: [], findings: [], evidence: [], feedback: [] }
-const demoStorageKey = 'bytexl-demo-workspace-v1'
+const demoStorageKey = 'bytegaurd-demo-workspace-v1'
 
 function readDemoData() {
   try {
@@ -85,6 +85,23 @@ export function WorkspaceProvider({ children, authenticated }: PropsWithChildren
   }, [refresh])
 
   const organizationId = data.organization?.id
+  const hasActiveScan = data.scans.some((scan) => scan.status === 'queued' || scan.status === 'running')
+
+  useEffect(() => {
+    if (!supabase || !authenticated || !organizationId) return
+    const client = supabase
+    const channel = client
+      .channel(`workspace-${organizationId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'scans', filter: `organization_id=eq.${organizationId}` }, () => { void refresh() })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'scan_sources', filter: `organization_id=eq.${organizationId}` }, () => { void refresh() })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'candidates', filter: `organization_id=eq.${organizationId}` }, () => { void refresh() })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'findings', filter: `organization_id=eq.${organizationId}` }, () => { void refresh() })
+      .subscribe()
+    const poll = window.setInterval(() => {
+      if (hasActiveScan) void refresh()
+    }, 2500)
+    return () => { window.clearInterval(poll); void client.removeChannel(channel) }
+  }, [authenticated, hasActiveScan, organizationId, refresh])
 
   const createBrand = useCallback(async (input: BrandInput) => {
     if (!organizationId) throw new Error('No organization is available for this account.')
