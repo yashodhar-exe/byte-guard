@@ -85,7 +85,7 @@ function riskSeverity(score: number) {
 }
 
 function calculateRisk(signals: Array<{ name: string; value: number | null; explanation: string }>) {
-  const weights: Record<string, number> = { name: 25, logo: 25, description: 20, publisher: 15, links: 15 }
+  const weights: Record<string, number> = { name: 25, logo: 25, description: 20, publisher: 15, links: 15, threat_intelligence: 30 }
   const available = signals.filter((signal) => signal.value !== null)
   const totalWeight = available.reduce((total, signal) => total + weights[signal.name], 0)
   const score = totalWeight === 0 ? 0 : Math.round(available.reduce((total, signal) => total + (signal.value ?? 0) * weights[signal.name], 0) / totalWeight)
@@ -207,6 +207,258 @@ async function searchBluesky(terms: string[]): Promise<ProviderResult> {
   }
 }
 
+async function searchInstagram(terms: string[]): Promise<ProviderResult> {
+  const apiKey = Deno.env.get('GRAMSCRAPER_API_KEY') || 'gs_eyJzdWIiOiJlNDI3NmY1ZS0xNzdkLTQ0M2MtODZkMC1lNzcxZWVmOTBlM2QiLCJraWQiOiJkMzMxM2I4Zi1lYjhhLTQwMmQtYTYxYS03YjU5NjY4YjhhNDIiLCJpYXQiOjE3OTE2MjI0MDc5NDUsInYiOjJ9.ofup5oZfYfkRuyjMNOgyPJwnOVHAb_CPfycDJlqZ6O0'
+  if (!apiKey) {
+    return unavailableProvider('GramScraper Instagram API', 'social', 'GRAMSCRAPER_API_KEY is not configured.', {
+      search: 'public reels, hashtag media, and profile discovery',
+      credentials: 'GRAMSCRAPER_API_KEY required'
+    })
+  }
+
+  const candidates: NormalizedCandidate[] = []
+  const seenUsers = new Set<string>()
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    accept: 'application/json'
+  }
+
+  try {
+    for (const term of terms.slice(0, 3)) {
+      // 1. Discover public reels and their authors for brand terms
+      try {
+        const reelsUrl = new URL('https://gramscraper.com/api/instagram/v2/fbsearch/reels')
+        reelsUrl.searchParams.set('query', term)
+        const reelsPayload = await fetchJson(reelsUrl.toString(), { headers })
+        const rawItems = (reelsPayload.response && typeof reelsPayload.response === 'object' && Array.isArray((reelsPayload.response as Record<string, unknown>).items))
+          ? (reelsPayload.response as Record<string, unknown>).items as unknown[]
+          : Array.isArray(reelsPayload.items)
+            ? reelsPayload.items
+            : []
+
+        for (const item of rawItems) {
+          if (!item || typeof item !== 'object') continue
+          const record = item as Record<string, unknown>
+          const user = record.user && typeof record.user === 'object' ? record.user as Record<string, unknown> : null
+          if (!user) continue
+          const username = String(user.username ?? '').trim()
+          const userId = String(user.pk ?? user.id ?? username)
+          if (!username || seenUsers.has(username.toLowerCase())) continue
+          seenUsers.add(username.toLowerCase())
+
+          const captionObj = record.caption && typeof record.caption === 'object' ? record.caption as Record<string, unknown> : null
+          const captionText = typeof captionObj?.text === 'string' ? captionObj.text : ''
+          const shortcode = String(record.code ?? '')
+
+          candidates.push({
+            sourceType: 'social',
+            platform: 'Instagram',
+            externalId: userId,
+            name: String(user.full_name || username),
+            username: `@${username}`,
+            description: captionText.slice(0, 4000) || `Public Instagram reel author matching "${term}".`,
+            sourceUrl: `https://www.instagram.com/${encodeURIComponent(username)}/`,
+            imageUrl: asHttpsUrl(user.profile_pic_url),
+            publisher: String(user.full_name || username),
+            publisherWebsite: null,
+            rating: null,
+            downloadEstimate: null,
+            rawMetadata: {
+              userId,
+              handle: username,
+              isVerified: Boolean(user.is_verified),
+              shortcode,
+              reelUrl: shortcode ? `https://www.instagram.com/reel/${shortcode}/` : null,
+              matchedQuery: term,
+              source: 'fbsearch/reels'
+            }
+          })
+        }
+      } catch (err) {
+        console.warn('GramScraper reels search error:', err)
+      }
+
+      // 2. Discover public accounts posting under brand hashtags
+      try {
+        const hashtagName = term.toLowerCase().replace(/[^a-z0-9_]/g, '')
+        if (hashtagName) {
+          const hashtagUrl = new URL('https://gramscraper.com/api/instagram/v2/hashtag/medias/recent')
+          hashtagUrl.searchParams.set('name', hashtagName)
+          const hashtagPayload = await fetchJson(hashtagUrl.toString(), { headers })
+          const rawItems = (hashtagPayload.response && typeof hashtagPayload.response === 'object' && Array.isArray((hashtagPayload.response as Record<string, unknown>).items))
+            ? (hashtagPayload.response as Record<string, unknown>).items as unknown[]
+            : Array.isArray(hashtagPayload.items)
+              ? hashtagPayload.items
+              : []
+
+          for (const item of rawItems) {
+            if (!item || typeof item !== 'object') continue
+            const record = item as Record<string, unknown>
+            const user = record.user && typeof record.user === 'object' ? record.user as Record<string, unknown> : null
+            if (!user) continue
+            const username = String(user.username ?? '').trim()
+            const userId = String(user.pk ?? user.id ?? username)
+            if (!username || seenUsers.has(username.toLowerCase())) continue
+            seenUsers.add(username.toLowerCase())
+
+            const captionObj = record.caption && typeof record.caption === 'object' ? record.caption as Record<string, unknown> : null
+            const captionText = typeof captionObj?.text === 'string' ? captionObj.text : ''
+            const shortcode = String(record.code ?? '')
+
+            candidates.push({
+              sourceType: 'social',
+              platform: 'Instagram',
+              externalId: userId,
+              name: String(user.full_name || username),
+              username: `@${username}`,
+              description: captionText.slice(0, 4000) || `Public Instagram author posting under #${hashtagName}.`,
+              sourceUrl: `https://www.instagram.com/${encodeURIComponent(username)}/`,
+              imageUrl: asHttpsUrl(user.profile_pic_url),
+              publisher: String(user.full_name || username),
+              publisherWebsite: null,
+              rating: null,
+              downloadEstimate: null,
+              rawMetadata: {
+                userId,
+                handle: username,
+                isVerified: Boolean(user.is_verified),
+                shortcode,
+                postUrl: shortcode ? `https://www.instagram.com/p/${shortcode}/` : null,
+                hashtag: hashtagName,
+                source: 'hashtag/medias/recent'
+              }
+            })
+          }
+        }
+      } catch (err) {
+        console.warn('GramScraper hashtag search error:', err)
+      }
+    }
+
+    // 3. Enrich candidate authors with profile, bio, links, and verification
+    for (const candidate of candidates.slice(0, 3)) {
+      const handle = candidate.username?.replace(/^@/, '')
+      if (!handle) continue
+      try {
+        const userUrl = new URL('https://gramscraper.com/api/instagram/v2/user/by/username')
+        userUrl.searchParams.set('username', handle)
+        const userPayload = await fetchJson(userUrl.toString(), { headers })
+        const userData = (userPayload.response && typeof userPayload.response === 'object')
+          ? userPayload.response as Record<string, unknown>
+          : userPayload
+
+        if (userData && typeof userData === 'object') {
+          if (typeof userData.biography === 'string' && userData.biography) {
+            candidate.description = userData.biography.slice(0, 4000)
+          }
+          if (typeof userData.full_name === 'string' && userData.full_name) {
+            candidate.name = userData.full_name
+            candidate.publisher = userData.full_name
+          }
+          if (typeof userData.external_url === 'string' && userData.external_url) {
+            candidate.publisherWebsite = asHttpsUrl(userData.external_url)
+          }
+          if (typeof userData.profile_pic_url === 'string' && userData.profile_pic_url) {
+            candidate.imageUrl = asHttpsUrl(userData.profile_pic_url)
+          }
+          if (typeof userData.follower_count === 'number') {
+            candidate.downloadEstimate = userData.follower_count
+            candidate.rawMetadata.followerCount = userData.follower_count
+          }
+          if (typeof userData.is_verified === 'boolean') {
+            candidate.rawMetadata.isVerified = userData.is_verified
+          }
+        }
+      } catch (enrichErr) {
+        console.warn(`GramScraper enrichment failed for @${handle}:`, enrichErr)
+      }
+    }
+
+    return {
+      provider: 'GramScraper Instagram API',
+      sourceType: 'social',
+      status: 'completed',
+      candidates,
+      errorMessage: null,
+      capability: {
+        search: 'public reels, hashtag media, and profile discovery',
+        credentials: 'GRAMSCRAPER_API_KEY configured',
+        endpoints: ['fbsearch/reels', 'hashtag/medias/recent', 'user/by/username']
+      }
+    }
+  } catch (error) {
+    const detail = safeError(error)
+    return {
+      provider: 'GramScraper Instagram API',
+      sourceType: 'social',
+      status: detail.status,
+      candidates,
+      errorMessage: detail.message,
+      capability: { search: 'public reels and hashtag discovery', credentials: 'GRAMSCRAPER_API_KEY configured' }
+    }
+  }
+}
+
+function phishStatsTerm(value: string) {
+  return normalizeName(value).replace(/[^a-z0-9]/g, '').slice(0, 64)
+}
+
+function phishStatsScore(value: unknown) {
+  const score = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(score) ? Math.round(Math.max(0, Math.min(100, score * 10))) : null
+}
+
+async function searchPhishStats(terms: string[]): Promise<ProviderResult> {
+  const candidates: NormalizedCandidate[] = []
+  const seen = new Set<string>()
+  try {
+    for (const term of terms.slice(0, 5)) {
+      const queryTerm = phishStatsTerm(term)
+      if (!queryTerm) continue
+      const url = new URL('https://api.phishstats.info/api/phishing')
+      url.searchParams.set('_where', `(title,like,${queryTerm})~or(url,like,${queryTerm})`)
+      url.searchParams.set('_sort', '-date')
+      url.searchParams.set('_p', '1')
+      url.searchParams.set('_size', '20')
+      const payload = await fetchJson(url.toString())
+      const records = Array.isArray(payload) ? payload : []
+      for (const item of records) {
+        if (!item || typeof item !== 'object') continue
+        const record = item as Record<string, unknown>
+        const observationId = String(record.id ?? '')
+        const observedUrl = typeof record.url === 'string' ? record.url.slice(0, 2048) : ''
+        const host = String(record.host ?? record.domain ?? '')
+        const title = String(record.title ?? '')
+        const externalId = observationId || observedUrl
+        if (!externalId || seen.has(externalId)) continue
+        seen.add(externalId)
+        candidates.push({
+          sourceType: 'web', platform: 'PhishStats', externalId,
+          name: host || title || `Phishing observation ${observationId}`, username: null,
+          description: title || 'Public phishing-feed observation.', sourceUrl: null, imageUrl: null,
+          publisher: host, publisherWebsite: null, rating: null, downloadEstimate: null,
+          rawMetadata: {
+            observationId,
+            observedUrl,
+            phishingScore: phishStatsScore(record.score),
+            reportedAt: String(record.date ?? ''),
+            host,
+            domain: String(record.domain ?? ''),
+            ip: String(record.ip ?? ''),
+            countryCode: String(record.countrycode ?? ''),
+            googleSafeBrowsing: String(record.google_safebrowsing ?? ''),
+            virusTotal: String(record.virus_total ?? '')
+          }
+        })
+      }
+    }
+    return { provider: 'PhishStats phishing feed', sourceType: 'web', status: 'completed', candidates, errorMessage: null, capability: { search: 'public phishing-feed observations matching protected terms', credentials: 'not_required', pages: 'bounded to five terms and 20 records each', limitation: 'Reported target URLs are stored as text and never opened or crawled by Byte Guard.' } }
+  } catch (error) {
+    const detail = safeError(error)
+    return { provider: 'PhishStats phishing feed', sourceType: 'web', status: detail.status, candidates, errorMessage: detail.message, capability: { search: 'public phishing-feed observations matching protected terms', credentials: 'not_required', limitation: 'Reported target URLs are stored as text and never opened or crawled by Byte Guard.' } }
+  }
+}
+
 function urlscanTerm(value: string) {
   return normalizeName(value).replace(/[^a-z0-9.-]/g, '')
 }
@@ -270,9 +522,12 @@ Deno.serve(async (request) => {
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   if (!supabaseUrl || !anonKey || !serviceRoleKey) return json({ error: 'Server configuration is incomplete.' }, 500)
-  let body: { brandId?: string }
-  try { body = await request.json() as { brandId?: string } } catch { return json({ error: 'A JSON body is required.' }, 400) }
+  let body: { brandId?: string; sourceTypes?: unknown }
+  try { body = await request.json() as { brandId?: string; sourceTypes?: unknown } } catch { return json({ error: 'A JSON body is required.' }, 400) }
   if (!body.brandId || !/^[0-9a-f-]{36}$/i.test(body.brandId)) return json({ error: 'A valid brandId is required.' }, 400)
+  const isSourceType = (value: unknown): value is SourceType => value === 'app' || value === 'social' || value === 'web'
+  if (body.sourceTypes !== undefined && (!Array.isArray(body.sourceTypes) || body.sourceTypes.length === 0 || !body.sourceTypes.every(isSourceType))) return json({ error: 'sourceTypes must be a non-empty array of app, social, and/or web.' }, 400)
+  const requestedSourceTypes: SourceType[] = body.sourceTypes === undefined ? ['app', 'social', 'web'] : [...new Set(body.sourceTypes)]
   const userClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authorization } } })
   const { data: userData, error: userError } = await userClient.auth.getUser()
   if (userError || !userData.user) return json({ error: 'Invalid user session.' }, 401)
@@ -288,9 +543,9 @@ Deno.serve(async (request) => {
   if (scanError || !scan) return json({ error: 'Could not create the scan record.' }, 500)
   const searchTerms = [...new Set([brand.name, ...(brand.aliases ?? []), ...(brand.product_names ?? [])].map((term) => String(term).trim()).filter(Boolean))]
   const results = await Promise.all([
-    searchApple(searchTerms),
-    searchBluesky(searchTerms),
-    searchUrlscan(searchTerms)
+    ...(requestedSourceTypes.includes('app') ? [searchApple(searchTerms)] : []),
+    ...(requestedSourceTypes.includes('social') ? [searchBluesky(searchTerms), searchInstagram(searchTerms)] : []),
+    ...(requestedSourceTypes.includes('web') ? [searchPhishStats(searchTerms), searchUrlscan(searchTerms)] : [])
   ])
   const sourceRows = results.map((result) => ({ organization_id: brand.organization_id, scan_id: scan.id, provider: result.provider, source_type: result.sourceType, status: result.status, capability: result.capability, records_collected: result.candidates.length, last_successful_retrieval: result.status === 'completed' ? now : null, error_message: result.errorMessage, data_origin: 'live' }))
   await admin.from('scan_sources').upsert(sourceRows, { onConflict: 'scan_id,provider' })
@@ -311,12 +566,14 @@ Deno.serve(async (request) => {
       const candidateDomain = candidate.publisherWebsite ? new URL(candidate.publisherWebsite).hostname : ''
       const trustedDomain = (brand.root_domains ?? []).some((domain: string) => candidateDomain === domain || candidateDomain.endsWith(`.${domain}`))
       const linkScore = candidate.publisherWebsite ? trustedDomain ? 0 : 70 : null
+      const threatIntelligenceScore = typeof candidate.rawMetadata.phishingScore === 'number' ? candidate.rawMetadata.phishingScore : null
       const signals = [
         { name: 'name', value: nameScore, explanation: 'Name similarity compares normalized brand names, aliases, and products.' },
         { name: 'logo', value: null, explanation: 'Logo analysis is unavailable because no compatible server-side image analysis provider is configured.' },
         { name: 'description', value: descriptionScore, explanation: 'Description similarity compares the returned source description with protected identity text.' },
         { name: 'publisher', value: publisherScore, explanation: 'Publisher differences are a risk signal, not proof of impersonation.' },
-        { name: 'links', value: linkScore, explanation: 'Unregistered publisher website domains are a risk signal, not proof of maliciousness.' }
+        { name: 'links', value: linkScore, explanation: 'Unregistered publisher website domains are a risk signal, not proof of maliciousness.' },
+        { name: 'threat_intelligence', value: threatIntelligenceScore, explanation: 'A public phishing-intelligence feed reported this observation. It requires analyst review and is not a maliciousness verdict.' }
       ]
       const assessment = calculateRisk(signals)
       if (!officialAsset && assessment.score < 45) continue

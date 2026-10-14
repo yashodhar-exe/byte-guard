@@ -49,7 +49,7 @@ export function StatusBadge({ status }: { status: ReviewStatus | TrustStatus | E
 }
 
 export function OriginBadge({ origin }: { origin: DataOrigin }) {
-  return <span className={cn('inline-flex rounded-sm border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest', origin === 'synthetic' ? 'border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-slate-950')}>{origin === 'synthetic' ? 'Demo' : 'Live'}</span>
+  return null
 }
 
 export function EmptyState({ title, description, action }: { title: string; description: string; action?: ReactNode }) {

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react'
 import { cloneDemoWorkspace } from './demo-data'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
-import type { AnalystFeedback, Brand, BrandAsset, Candidate, Evidence, Finding, Organization, ReviewStatus, Scan, ScanSource, WorkspaceData } from '../lib/types'
+import type { AnalystFeedback, Brand, BrandAsset, Candidate, Evidence, Finding, Organization, ReviewStatus, Scan, ScanSource, SourceType, WorkspaceData } from '../lib/types'
 
 type BrandInput = Pick<Brand, 'name' | 'description' | 'website' | 'root_domains' | 'aliases' | 'product_names' | 'keywords' | 'identifiers' | 'region' | 'official_description'>
 type AssetInput = Pick<BrandAsset, 'brand_id' | 'asset_type' | 'platform' | 'external_id' | 'url' | 'package_or_bundle_id' | 'store_listing_id' | 'publisher' | 'trust_status' | 'relationship_note'>
@@ -14,7 +14,7 @@ interface WorkspaceContextValue extends WorkspaceData {
   createBrand: (input: BrandInput) => Promise<Brand>
   createAsset: (input: AssetInput) => Promise<BrandAsset>
   uploadLogo: (brandId: string, file: File) => Promise<void>
-  startScan: (brandId: string, mode: 'live' | 'demo') => Promise<void>
+  startScan: (brandId: string, mode: 'live' | 'demo', sourceTypes?: SourceType[]) => Promise<void>
   updateFinding: (findingId: string, status: ReviewStatus, notes: string) => Promise<void>
 }
 
@@ -141,10 +141,10 @@ export function WorkspaceProvider({ children, authenticated }: PropsWithChildren
     await refresh()
   }, [organizationId, refresh])
 
-  const startScan = useCallback(async (brandId: string, mode: 'live' | 'demo') => {
+  const startScan = useCallback(async (brandId: string, mode: 'live' | 'demo', sourceTypes?: SourceType[]) => {
     if (!organizationId) throw new Error('No organization is available for this account.')
     if (supabase && mode === 'live') {
-      const { error: invokeError } = await supabase.functions.invoke('scan-brand', { body: { brandId } })
+      const { error: invokeError } = await supabase.functions.invoke('scan-brand', { body: { brandId, sourceTypes } })
       if (invokeError) throw invokeError
       await refresh()
       return
